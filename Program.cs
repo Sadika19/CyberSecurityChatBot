@@ -1,45 +1,39 @@
 ﻿using System;
-using System.Media;
 
 class Program
 {
     static void Main(string[] args)
     {
-        // === Voice Greeting ===
-        try
-        {
-            SoundPlayer player = new SoundPlayer("greeting.wav");
-            player.PlaySync();  // or Play() for async
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine("Audio error: " + ex.Message);
-        }
-
+        // === Voice Greeting Placeholder ===
+        Console.WriteLine("🔊 Voice greeting would play here if audio support was enabled.");
 
         // === ASCII Art Header ===
         Console.ForegroundColor = ConsoleColor.Cyan;
         Console.WriteLine(@"
-   ____            _                  _         _       
-  / ___|___  _ __ | |_ ___  _ __ ___ (_)___ ___| |_ ___ 
- | |   / _ \| '_ \| __/ _ \| '_ ` _ \| / __/ __| __/ __|
- | |__| (_) | | | | || (_) | | | | | | \__ \__ \ |_\__ \
-  \____\___/|_| |_|\__\___/|_| |_| |_|_|___/___/\__|___/
+ 
+          /\_/\  
+         ( o.o ) 
+          > ^ < 
+         (_w_w_)
+
+                                   
         ");
         Console.ResetColor();
 
-        // === Simulated Chat ===
-        Console.WriteLine("\nLet's chat about online safety. Type 'exit' to leave.\n");
+        // === Ask for Name & Personalized Greeting ===
+        Console.Write("\n👋 Hello! What's your name? ");
+        string name = Console.ReadLine();
+        Console.WriteLine($"Welcome, {name}! Let's chat about online safety. Type 'exit' to leave.\n");
 
+        // === Simulated Chat ===
         while (true)
         {
-            Console.Write("You: ");
+            Console.Write($"{name}: ");
             string input = Console.ReadLine()?.ToLower() ?? "";
-
 
             if (input == "exit")
             {
-                Console.WriteLine("Bot: Stay safe online! Goodbye.");
+                Console.WriteLine("Bot: Stay safe online! Goodbye. 👋");
                 break;
             }
             else if (input.Contains("password"))
