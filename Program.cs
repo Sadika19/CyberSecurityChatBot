@@ -1,11 +1,9 @@
 ﻿using System;
-using System.Diagnostics;
-using System.Media;
 using System.Threading;
+using NAudio.Wave; // NEW
 
 class Program
 {
-    // Simulates typing effect
     static void TypeEffect(string message, int delay = 40)
     {
         foreach (char c in message)
@@ -16,28 +14,32 @@ class Program
         Console.WriteLine();
     }
 
-    static void Main(string[] args)
+    static void PlayAudio(string filePath)
     {
-        // === Voice Greeting (Cross-platform) ===
         try
         {
-            var filePath = Path.Combine(Directory.GetCurrentDirectory(), "greeting.wav");
-            var process = new Process
+            using var audioFile = new AudioFileReader(filePath);
+            using var outputDevice = new WaveOutEvent();
+            outputDevice.Init(audioFile);
+            outputDevice.Play();
+
+            while (outputDevice.PlaybackState == PlaybackState.Playing)
             {
-                StartInfo = new ProcessStartInfo(filePath)
-                {
-                    UseShellExecute = true
-                }
-            };
-            process.Start();
+                Thread.Sleep(100);
+            }
         }
         catch (Exception ex)
         {
-            Console.WriteLine("Audio error: " + ex.Message);
+            Console.WriteLine("Audio playback error: " + ex.Message);
         }
+    }
 
+    static void Main(string[] args)
+    {
+        // === Voice Greeting ===
+        PlayAudio("greeting.wav");
 
-        // === ASCII CatBot Logo ===
+        // === ASCII Art Header ===
         Console.ForegroundColor = ConsoleColor.Cyan;
         Console.WriteLine(@"
       /\_/\  
@@ -48,36 +50,28 @@ class Program
 ");
         Console.ResetColor();
 
-        // === Personalized Greeting ===
-        Console.ForegroundColor = ConsoleColor.Yellow;
-        Console.Write("Please enter your name: ");
+        // === Ask User for Name ===
+        Console.Write("\nPlease enter your name: ");
         string userName = Console.ReadLine();
+
+        Console.ForegroundColor = ConsoleColor.Yellow;
+        TypeEffect($"Welcome {userName}! Let's chat about online safety. Type 'exit' to leave.\n");
         Console.ResetColor();
 
-        Console.ForegroundColor = ConsoleColor.Green;
-        TypeEffect($"\nWelcome {userName}! Let's chat about staying safe online.\n");
-        Console.ResetColor();
-
-        // === Chat Instructions ===
-        Console.WriteLine("Type your questions below (e.g., 'passwords', '2FA', 'phishing', etc.)");
-        Console.WriteLine("Type 'exit' to leave.\n");
-        Console.WriteLine("=========================================\n");
-
+        // === Chat Loop ===
         while (true)
         {
-            Console.ForegroundColor = ConsoleColor.Magenta;
-            Console.Write("You: ");
-            string input = Console.ReadLine()?.ToLower().Trim() ?? "";
-            Console.ResetColor();
+            Console.Write("\nYou: ");
+            string input = Console.ReadLine()?.ToLower() ?? "";
 
-            if (input == "exit")
+            if (string.IsNullOrWhiteSpace(input))
+            {
+                TypeEffect("Bot: I didn’t quite understand that. Could you rephrase?");
+            }
+            else if (input == "exit")
             {
                 TypeEffect("Bot: Stay safe online! Goodbye.");
                 break;
-            }
-            else if (string.IsNullOrWhiteSpace(input))
-            {
-                TypeEffect("Bot: I didn’t quite understand that. Could you rephrase?");
             }
             else if (input.Contains("password"))
             {
@@ -89,19 +83,19 @@ class Program
             }
             else if (input.Contains("2fa") || input.Contains("two factor"))
             {
-                TypeEffect("Bot: Two-factor authentication protects your accounts. Always enable it.");
+                TypeEffect("Bot: Two-factor authentication helps protect your accounts. Always enable it.");
             }
             else if (input.Contains("safe") || input.Contains("online"))
             {
-                TypeEffect("Bot: Keep software updated and use antivirus tools.");
+                TypeEffect("Bot: Keep your software updated and use antivirus tools.");
             }
             else if (input.Contains("how are you"))
             {
-                TypeEffect("Bot: I'm doing well, thank you! I'm here to keep you safe online.");
+                TypeEffect("Bot: I'm doing well, thank you! I'm here to help keep you safe online.");
             }
             else if (input.Contains("purpose"))
             {
-                TypeEffect("Bot: I'm your Cybersecurity Awareness Bot. I provide tips to stay secure.");
+                TypeEffect("Bot: I'm your Cybersecurity Awareness Bot. I provide online safety tips.");
             }
             else if (input.Contains("what can i ask") || input.Contains("help"))
             {
@@ -109,10 +103,16 @@ class Program
             }
             else
             {
-                TypeEffect("Bot: Hmm, I didn't quite catch that. Could you ask about something like 'passwords' or '2FA'?");
+                TypeEffect("Bot: Try asking about passwords, phishing, 2FA, or online safety.");
             }
-
-            Console.WriteLine("\n-----------------------------------------\n");
         }
     }
 }
+
+
+
+
+
+
+
+       
