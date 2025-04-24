@@ -1,9 +1,11 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Media;
 using System.Threading;
 
 class Program
 {
+    // Simulates typing effect
     static void TypeEffect(string message, int delay = 40)
     {
         foreach (char c in message)
@@ -16,41 +18,66 @@ class Program
 
     static void Main(string[] args)
     {
-        
+        // === Voice Greeting (Cross-platform) ===
+        try
         {
-          
+            var filePath = Path.Combine(Directory.GetCurrentDirectory(), "greeting.wav");
+            var process = new Process
+            {
+                StartInfo = new ProcessStartInfo(filePath)
+                {
+                    UseShellExecute = true
+                }
+            };
+            process.Start();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine("Audio error: " + ex.Message);
         }
 
-        // === ASCII Art Header ===
+
+        // === ASCII CatBot Logo ===
         Console.ForegroundColor = ConsoleColor.Cyan;
         Console.WriteLine(@"
-        /\_/\           ____  
-       ( o.o )         |__  | 
-        > ^ <         |___| | Cybersecurity CatBot
-        ");
+      /\_/\  
+     ( o.o )    CYBERSECURITY CATBOT
+      > ^ <     Stay Safe Online!
+     (_w_w_)
+=========================================
+");
         Console.ResetColor();
 
-        // === Ask User for Name ===
-        Console.Write("\nPlease enter your name: ");
-        string userName = Console.ReadLine();
-
+        // === Personalized Greeting ===
         Console.ForegroundColor = ConsoleColor.Yellow;
-        TypeEffect($"\nWelcome {userName}! Let's chat about online safety. Type 'exit' to leave.\n");
+        Console.Write("Please enter your name: ");
+        string userName = Console.ReadLine();
         Console.ResetColor();
+
+        Console.ForegroundColor = ConsoleColor.Green;
+        TypeEffect($"\nWelcome {userName}! Let's chat about staying safe online.\n");
+        Console.ResetColor();
+
+        // === Chat Instructions ===
+        Console.WriteLine("Type your questions below (e.g., 'passwords', '2FA', 'phishing', etc.)");
+        Console.WriteLine("Type 'exit' to leave.\n");
+        Console.WriteLine("=========================================\n");
 
         while (true)
         {
-            Console.Write("\nYou: ");
-            string input = Console.ReadLine()?.ToLower() ?? "";
+            Console.ForegroundColor = ConsoleColor.Magenta;
+            Console.Write("You: ");
+            string input = Console.ReadLine()?.ToLower().Trim() ?? "";
+            Console.ResetColor();
 
-            if (string.IsNullOrWhiteSpace(input))
-            {
-                TypeEffect("Bot: I didn’t quite understand that. Could you rephrase?");
-            }
-            else if (input.Contains("exit"))
+            if (input == "exit")
             {
                 TypeEffect("Bot: Stay safe online! Goodbye.");
                 break;
+            }
+            else if (string.IsNullOrWhiteSpace(input))
+            {
+                TypeEffect("Bot: I didn’t quite understand that. Could you rephrase?");
             }
             else if (input.Contains("password"))
             {
@@ -62,19 +89,19 @@ class Program
             }
             else if (input.Contains("2fa") || input.Contains("two factor"))
             {
-                TypeEffect("Bot: Two-factor authentication helps protect your accounts. Always enable it.");
+                TypeEffect("Bot: Two-factor authentication protects your accounts. Always enable it.");
             }
             else if (input.Contains("safe") || input.Contains("online"))
             {
-                TypeEffect("Bot: Keep your software updated and use antivirus tools.");
+                TypeEffect("Bot: Keep software updated and use antivirus tools.");
             }
             else if (input.Contains("how are you"))
             {
-                TypeEffect("Bot: I'm doing well, thank you! I'm here to help keep you safe online.");
+                TypeEffect("Bot: I'm doing well, thank you! I'm here to keep you safe online.");
             }
             else if (input.Contains("purpose"))
             {
-                TypeEffect("Bot: I'm your Cybersecurity Awareness Bot. I provide online safety tips.");
+                TypeEffect("Bot: I'm your Cybersecurity Awareness Bot. I provide tips to stay secure.");
             }
             else if (input.Contains("what can i ask") || input.Contains("help"))
             {
@@ -82,8 +109,10 @@ class Program
             }
             else
             {
-                TypeEffect("Bot: Try asking about passwords, phishing, 2FA, or online safety.");
+                TypeEffect("Bot: Hmm, I didn't quite catch that. Could you ask about something like 'passwords' or '2FA'?");
             }
+
+            Console.WriteLine("\n-----------------------------------------\n");
         }
     }
 }
